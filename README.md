@@ -14,15 +14,9 @@ Fine-tuning **RibonanzaNet** to predict the 3D coordinates of RNA molecules dire
 1. [Overview](#-overview)
 2. [Problem Statement](#-problem-statement)
 3. [Approach at a Glance](#-approach-at-a-glance)
-4. [Repository Structure](#-repository-structure)
-5. [Dataset](#-dataset)
-6. [Methodology](#-methodology)
-7. [Results](#-results)
-8. [Getting Started](#-getting-started)
-9. [Configuration Reference](#-configuration-reference)
-10. [Limitations and Future Work](#-limitations-and-future-work)
-11. [Acknowledgements](#-acknowledgements)
-12. [Author](#-author)
+4. [Dataset](#-dataset)
+5. [Methodology](#-methodology)
+6. [Results](#-results)
 
 ---
 
@@ -75,17 +69,6 @@ flowchart LR
 
 ---
 
-## 📁 Repository Structure
-
-```
-.
-├── rna-3d-folding-ribonanzanet-training.ipynb    # Fine-tuning pipeline
-├── rna-3d-folding-ribonanzanet-inference.ipynb   # Prediction and submission
-├── submission.csv                                # Generated predictions (after running inference)
-└── README.md
-```
-
----
 
 ## 📊 Dataset
 
@@ -218,118 +201,8 @@ First residues of target `8ZNQ`, showing the predicted backbone trace (slot 1 sh
 
 Consecutive residues sit roughly 5 Å apart along the chain, consistent with the spacing expected between neighbouring nucleotides.
 
-### Performance metrics
 
-> Fill in your own numbers from the training logs and the Kaggle leaderboard.
 
-| Metric | Value |
-|---|---|
-| Best validation dRMAE | _your value_ |
-| Final training loss (dRMAE + aligned MAE) | _your value_ |
-| Kaggle public leaderboard score (TM-score) | _your value_ |
-| Kaggle private leaderboard score (TM-score) | _your value_ |
-| Leaderboard rank | _your value_ |
 
-### Training curves
 
-> Add your plots here, for example:
->
-> `![Training curve](assets/training_curve.png)`
 
----
-
-## 🚀 Getting Started
-
-### Option A: Run on Kaggle (recommended)
-
-1. Create a Kaggle notebook with a **GPU** accelerator.
-2. Add the competition data (`stanford-rna-3d-folding-2`) plus the three inputs listed under [Additional Kaggle inputs](#additional-kaggle-inputs-required).
-3. **Training:** open the training notebook, uncomment the `__main__` block in Section 8 and run all cells. Save the best checkpoint as `RibonanzaNet-3D.pt`.
-4. **Inference:** attach the fine-tuned weights as a Kaggle dataset, run the inference notebook, and submit the generated `submission.csv`.
-
-### Option B: Run locally
-
-```bash
-git clone https://github.com/<your-username>/<your-repo>.git
-cd <your-repo>
-
-pip install torch numpy pandas pyyaml tqdm matplotlib plotly jupyter
-jupyter notebook
-```
-
-Then update the paths in the `Config` class of each notebook to point at your local copies of the data, `Network.py`, `pairwise.yaml` and the weight files. A CUDA-capable GPU is required, since the notebooks call `.cuda()`.
-
-### Starting a training run
-
-```python
-best_loss, best_predictions = train_model(
-    model=model,
-    train_dl=train_loader,
-    val_dl=val_loader,
-    epochs=20,
-    cos_epoch=15,
-    lr=3e-4,
-    clip=1,
-)
-print(f"Best Validation Loss: {best_loss:.4f}")
-```
-
----
-
-## ⚙️ Configuration Reference
-
-| Parameter | Default | Description |
-|---|---|---|
-| `max_len` | 384 | Crop length in training and window size at inference |
-| `batch_size` | 1 | Structures per step |
-| `min_len_filter` | 10 | Discard structures at or below this length |
-| `max_len_filter` | 9,999,999 | Effectively no upper length cap |
-| `seed` | 42 | Random seed |
-| `num_tta` | 5 | Number of test-time candidates configured at inference |
-| `model_config_path` | `.../configs/pairwise.yaml` | RibonanzaNet architecture config |
-| `pretrained_weights_path` | `.../RibonanzaNet.pt` | Starting weights for fine-tuning |
-| `finetuned_weights_path` | `.../RibonanzaNet-3D.pt` | Fine-tuned weights for inference |
-
----
-
-## 🔧 Limitations and Future Work
-
-**Current limitations**
-
-- **Single deterministic prediction:** the same structure is currently written into all five submission slots, so the five-candidate allowance is not exploited.
-- **One coordinate per residue:** the head predicts a single point per nucleotide rather than a full atomic model.
-- **Windowed context for long RNAs:** sliding windows only see local context, so very long molecules may lose global fold information.
-- **Sequence-only input:** no multiple sequence alignment, secondary-structure or template information is used.
-
-**Ideas for improvement**
-
-- [ ] Generate **diverse candidates** (stochastic dropout, multiple checkpoints, test-time augmentation) to fill all five slots.
-- [ ] Add **template-based** modelling for targets with close homologues in the training set.
-- [ ] Incorporate **secondary-structure** predictions as auxiliary features or losses.
-- [ ] Add a **TM-score** based validation metric that mirrors the competition scoring.
-- [ ] Train on longer crops or use hierarchical stitching to preserve long-range contacts.
-- [ ] Ensemble several fine-tuned checkpoints.
-
----
-
-## 🙏 Acknowledgements
-
-- **Stanford RNA 3D Folding** competition organisers and the Kaggle community.
-- The **RibonanzaNet** authors for the pretrained RNA foundation model and open code.
-- Kaggle for GPU compute.
-
----
-
-## 👤 Author
-
-**Chikonzero**
-Biomedical Engineering graduate, Malawi University of Science and Technology (MUST)
-Focus: applied machine learning and medical AI
-
-- GitHub: [@your-username](https://github.com/your-username)
-- Kaggle: [your-kaggle-handle](https://www.kaggle.com/your-kaggle-handle)
-- LinkedIn: [your-profile](https://www.linkedin.com/in/your-profile)
-
----
-
-⭐ If you found this project useful, consider giving the repository a star.
